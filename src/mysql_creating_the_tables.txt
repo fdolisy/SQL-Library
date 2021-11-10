@@ -1,0 +1,47 @@
+drop table BOOK;
+drop table AUTHORS;
+drop table BOOK_AUTHORS;
+drop table BORROWER;
+drop table BOOK_LOANS;
+drop table FINES;
+
+create table BOOK (
+	Isbn int,
+	Title varchar(50),
+	constraint pkIsbn primary key(Isbn));
+
+create table AUTHORS (
+	Author_id int,
+	Name varchar(50),
+	constraint pkAuthor_id primary key(Author_id));
+
+create table BOOK_AUTHORS (
+	Author_id INT,	
+	Isbn INT,
+	constraint fkAuthor_id foreign key (Author_id) references AUTHORS(Author_id),
+	constraint fkIsbn foreign key (Isbn) references BOOK(ISBN));
+
+create table BORROWER (
+	Card_id INT,
+	Ssn INT,
+	Bname VARCHAR(50),
+	Address VARCHAR(50),
+	Phone VARCHAR(10),
+	constraint pkCard_id primary key(Card_id));
+
+create table BOOK_LOANS (
+	Loan_id INT,
+	Isbn INT,
+	Card_id INT,
+	Date_out VARCHAR(20),
+	Due_date VARCHAR(20),
+	Date_in VARCHAR(20),
+	constraint pkLoan_id primary key(Loan_id),
+	constraint fkCard_id foreign key (Card_id) references BORROWER(Card_id),
+	constraint fkBLIsbn foreign key (Isbn) references BOOK(ISBN));
+
+create table FINES (
+	Loan_id INT,
+	Fine_amt INT,
+	Paid INT,
+	constraint fkLoan_id foreign key(Loan_id) references BOOK_LOANS(Loan_id));
