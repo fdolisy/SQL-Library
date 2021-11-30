@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.sql.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ObservableValue;
@@ -376,26 +378,54 @@ public class SceneController {
 
     }
     
+    public static boolean isNumeric(String str) {
+        try {
+            Double.parseDouble(str);
+            return true;
+        } catch(NumberFormatException e){
+            return false;
+        }
+    }
+    
     public void handleBorrowerAction(ActionEvent actionEvent)  throws IOException, SQLException {
         scene = (Scene) ((Node) actionEvent.getSource()).getScene();
-        Alert emptyAlert = new Alert (AlertType.ERROR, "You have empty fields!", ButtonType.OK);
-        boolean passing = true;
-        if (FirstName.getText() == "" || LastName.getText() == "" || SSN.getText() == "" || Address.getText() == "" || City.getText() == "" || State.getText() == "")
-        {
-            emptyAlert.show();
-            return;
-        }
         
-    	String firstN = FirstName.getText();
+        Alert emptyAlert = new Alert (AlertType.ERROR, "You still have empty fields!", ButtonType.OK);
+        Alert SSNFormat = new Alert (AlertType.ERROR, "Invalid Format for SSN. Use '###-##-####'.", ButtonType.OK);
+        Alert phoneNumberFormat = new Alert (AlertType.ERROR, "Invalid Format for Phone Number. Use '###-###-####'.", ButtonType.OK);
+        
+        String firstN = FirstName.getText();
         String lastN = LastName.getText();
         String phoneNum = PhoneNumber.getText();
         String social = SSN.getText();
         String addr = Address.getText();
         String cit = City.getText();
         String stat = State.getText();
-        System.out.println(stat);
-        Borrower.connectDatabase();
-        Borrower.createNewBorrower(social, firstN + " " + lastN, addr, cit, stat, phoneNum);
+        String Bname = firstN + " " + lastN;
+        
+        if (firstN == "" || lastN == "" || phoneNum == "" || social == "" || addr == "" || cit == "" || stat == "") {
+            emptyAlert.show();
+            return;
+        }
+        
+        String phoneNumberRegex = "^[0-9]{3}-[0-9]{3}-[0-9]{4}$";
+        Pattern phoneNumberPattern = Pattern.compile(phoneNumberRegex);
+        Matcher phoneNumberMatcher = phoneNumberPattern.matcher(phoneNum);
+        
+        String ssnRegex = "^(?!000|666)[0-8][0-9]{2}-(?!00)[0-9]{2}-(?!0000)[0-9]{4}$";
+        Pattern ssnPattern = Pattern.compile(ssnRegex);
+        Matcher ssnMatcher = ssnPattern.matcher(social);
+        
+        if (!phoneNumberMatcher.matches()) {
+        	phoneNumberFormat.show();
+        }
+        else if (!ssnMatcher.matches()) {
+        	SSNFormat.show();
+        }
+        else {
+        	Borrower.connectDatabase();
+            Borrower.createNewBorrower(social, Bname, addr, cit, stat, phoneNum);
+        }
     }
 
     /**
