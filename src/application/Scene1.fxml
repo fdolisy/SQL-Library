@@ -8,8 +8,6 @@
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.control.TreeTableColumn?>
-<?import javafx.scene.control.TreeTableView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
@@ -26,14 +24,15 @@
                             <children>
                                 <TableView id="searchTable" fx:id="searchTable" layoutX="15.0" layoutY="48.0" prefHeight="305.0" prefWidth="567.0">
                                     <columns>
-                                        <TableColumn id="isbnCol" fx:id="isbnCol" prefWidth="106.0" text="ISBN" />
-                                        <TableColumn id="titleCol" fx:id="titleCol" prefWidth="193.0" text="Title" />
-                                        <TableColumn id="authorCol" fx:id="authorCol" prefWidth="177.0" text="Author(s)" />
-                                        <TableColumn id="avCol" fx:id="avCol" prefWidth="90.0" text="Check Out" />
+                                        <TableColumn id="isbnCol" fx:id="isbnCol" prefWidth="75.0" text="ISBN" />
+                                        <TableColumn id="titleCol" fx:id="titleCol" prefWidth="190.0" text="Title" />
+                                        <TableColumn id="authorCol" fx:id="authorCol" prefWidth="140.0" text="Author(s)" />
+                                        <TableColumn id="statusCol" fx:id="statusCol" prefWidth="70.0" text="Available?" />
+                                        <TableColumn id="avCol" fx:id="avCol" prefWidth="80.0" text="Check Out" />
                                     </columns>
                                 </TableView>
-                                <TextField id="searchField" fx:id="searchField" layoutX="15.0" layoutY="14.0" prefHeight="25.0" prefWidth="191.0" promptText="Search for Books..." onAction="#handleSearchAction" />
-                                <Button fx:id="searchButton" layoutX="215.0" layoutY="14.0" mnemonicParsing="false" text="Search" onAction="#handleSearchAction" />
+                                <TextField id="searchField" fx:id="searchField" layoutX="15.0" layoutY="14.0" onAction="#handleSearchAction" prefHeight="25.0" prefWidth="191.0" promptText="Search for Books..." />
+                                <Button fx:id="searchButton" layoutX="215.0" layoutY="14.0" mnemonicParsing="false" onAction="#handleSearchAction" text="Search" />
                             </children>
                         </AnchorPane>
                     </content>
@@ -46,7 +45,7 @@
                                     <columns>
                                         <TableColumn id="loanCol" fx:id="loanCol" prefWidth="50.0" text="Loan ID" />
                                         <TableColumn id="blisbnCol" fx:id="blisbnCol" prefWidth="74.0" text="ISBN" />
-                                        <TableColumn id="cardCol" fx:id="cardCol" prefWidth="84.0" text="Card ID" />
+                                        <TableColumn id="cardCol" fx:id="cardCol" prefWidth="60.0" text="Card ID" />
                                         <TableColumn id="outCol" fx:id="outCol" prefWidth="95.0" text="Date Out" />
                                         <TableColumn id="dueCol" fx:id="dueCol" prefWidth="95.0" text="Due Date" />
                                         <TableColumn id="inCol" fx:id="inCol" prefWidth="95.0" text="Date In" />
@@ -54,7 +53,7 @@
                                     </columns>
                                 </TableView>
                                 <TextField id="searchField2" fx:id="searchField2" layoutX="15.0" layoutY="14.0" prefHeight="25.0" prefWidth="191.0" promptText="Search for Book Loans..." />
-                                <Button fx:id="searchButton2" layoutX="215.0" layoutY="14.0" mnemonicParsing="false" text="Search" onAction="#checkInSearchAction"/>
+                                <Button fx:id="searchButton2" layoutX="215.0" layoutY="14.0" mnemonicParsing="false" onAction="#checkInSearchAction" text="Search" />
                             </children>
                         </AnchorPane>
                     </content>
@@ -84,28 +83,28 @@
                                         <RowConstraints maxHeight="175.0" minHeight="10.0" prefHeight="149.0" vgrow="SOMETIMES" />
                                     </rowConstraints>
                                     <children>
-                                        <TextField prefHeight="25.0" prefWidth="179.0" GridPane.rowIndex="1" GridPane.valignment="TOP" />
-                                        <Label text="First Name" />
+                                        <TextField id="FirstName" fx:id="FirstName" prefHeight="25.0" prefWidth="179.0" GridPane.rowIndex="1" GridPane.valignment="TOP" />
+                                        <TextField id="LastName" fx:id="LastName" prefHeight="25.0" prefWidth="179.0" GridPane.columnIndex="1" GridPane.rowIndex="1" GridPane.valignment="TOP" />
+                                        <TextField id="PhoneNumber" fx:id="PhoneNumber" prefHeight="25.0" prefWidth="76.0" GridPane.rowIndex="3" GridPane.valignment="TOP" />
+                                        <TextField id="SSN" fx:id="SSN" prefHeight="25.0" prefWidth="179.0" GridPane.columnIndex="1" GridPane.rowIndex="3" GridPane.valignment="TOP" />
+                                        <TextField id="Address" fx:id="Address" prefHeight="25.0" prefWidth="179.0" GridPane.rowIndex="5" GridPane.valignment="TOP" />
+                                        <TextField id="City" fx:id="City" prefHeight="25.0" prefWidth="179.0" GridPane.columnIndex="1" GridPane.rowIndex="5" GridPane.valignment="TOP" />
+                                        <TextField id="State" fx:id="State" prefHeight="25.0" prefWidth="179.0" GridPane.columnIndex="2" GridPane.rowIndex="5" GridPane.valignment="TOP" />
                                         <Label text="Last Name" GridPane.columnIndex="1" />
-                                        <TextField prefHeight="25.0" prefWidth="179.0" GridPane.columnIndex="1" GridPane.rowIndex="1" GridPane.valignment="TOP" />
+                                        <Label text="First Name" />
                                         <Label text="Phone Number" GridPane.rowIndex="2" />
                                         <Label text="SSN" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                                         <Label text="Address" GridPane.rowIndex="4" />
                                         <Label text="City" GridPane.columnIndex="1" GridPane.rowIndex="4" />
                                         <Label text="State (Initials)" GridPane.columnIndex="2" GridPane.rowIndex="4" />
-                                        <TextField prefHeight="25.0" prefWidth="179.0" GridPane.columnIndex="1" GridPane.rowIndex="3" GridPane.valignment="TOP" />
-                                        <TextField prefHeight="25.0" prefWidth="76.0" GridPane.rowIndex="3" GridPane.valignment="TOP" />
-                                        <TextField prefHeight="25.0" prefWidth="179.0" GridPane.columnIndex="2" GridPane.rowIndex="5" GridPane.valignment="TOP" />
-                                        <TextField prefHeight="25.0" prefWidth="179.0" GridPane.columnIndex="1" GridPane.rowIndex="5" GridPane.valignment="TOP" />
-                                        <TextField prefHeight="25.0" prefWidth="179.0" GridPane.rowIndex="5" GridPane.valignment="TOP" />
-                                        <Button mnemonicParsing="false" text="Create Borrower" GridPane.halignment="LEFT" GridPane.rowIndex="6" GridPane.valignment="TOP" />
+                                        <Button mnemonicParsing="false" onAction="#handleBorrowerAction" text="Create Borrower" GridPane.halignment="LEFT" GridPane.rowIndex="6" GridPane.valignment="TOP" />
                                     </children>
                                 </GridPane>
                             </children>
                         </AnchorPane>
                     </content>
                 </Tab>
-                <Tab text="Fines" fx:id="finesTab" onSelectionChanged="#displayFines">
+                <Tab fx:id="finesTab" onSelectionChanged="#displayFines" text="Fines">
                     <content>
                         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                             <children>
@@ -115,12 +114,12 @@
                                         <TableColumn id="bookTitle" fx:id="bookTitleCol" prefWidth="176.0" text="Book Title" />
                                         <TableColumn id="daysLate" fx:id="daysLateCol" prefWidth="73.0" text="Days Late" />
                                         <TableColumn id="fineAmt" fx:id="fineAmtCol" prefWidth="97.0" text="Fine Amt. ($)" />
-                                        <TableColumn id="finePaid" fx:id="finePaidCol" prefWidth="88.0" text="Pay Fine" />
+                                        <TableColumn id="finePaid" fx:id="finePaidCol" prefWidth="88.0" text="Is Fine Paid?" />
                                     </columns>
                                 </TableView>
-                                <CheckBox fx:id="paidFinesCheckbox" layoutX="14.0" layoutY="336.0" mnemonicParsing="false" text="Show Previously Paid Fines" onAction="#getPaidFines" />
-                                <Button layoutX="300.0" layoutY="332.0" mnemonicParsing="false" text="Pay Selected Fine" onAction="#payFine"/>
-                                <Button layoutX="496.0" layoutY="332.0" mnemonicParsing="false" text="Refresh Fines" onAction="#updateUnpaidFines" />
+                                <CheckBox fx:id="paidFinesCheckbox" layoutX="14.0" layoutY="336.0" mnemonicParsing="false" onAction="#getPaidFines" text="Show Previously Paid Fines" />
+                                <Button layoutX="300.0" layoutY="332.0" mnemonicParsing="false" onAction="#payFine" text="Pay Selected Fine" />
+                                <Button layoutX="496.0" layoutY="332.0" mnemonicParsing="false" onAction="#updateUnpaidFines" text="Refresh Fines" />
                             </children></AnchorPane>
                     </content>
                 </Tab>

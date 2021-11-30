@@ -18,6 +18,7 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.Alert.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
@@ -38,6 +39,7 @@ public class SceneController {
     @FXML private TableColumn isbnCol;
     @FXML private TableColumn  titleCol;
     @FXML private TableColumn  authorCol;
+    @FXML private TableColumn  statusCol;
     @FXML private TableColumn  avCol;
 
     @FXML private TableView searchTable2;
@@ -59,6 +61,14 @@ public class SceneController {
     @FXML private CheckBox paidFinesCheckbox;
 
     @FXML private Tab finesTab;
+    
+    @FXML private TextField FirstName;
+    @FXML private TextField LastName;
+    @FXML private TextField PhoneNumber;
+    @FXML private TextField SSN;
+    @FXML private TextField Address;
+    @FXML private TextField City;
+    @FXML private TextField State;
 
     static String message = "Testing";
     static Text resultingMessage = new Text();
@@ -119,7 +129,7 @@ public class SceneController {
                         } else {
                             btn.setOnAction(event -> {
                                 // GETTING THE CURRENT DATE
-                                DateTimeFormatter myFormatObj = DateTimeFormatter.ofPattern("dd-MMM-yyyy"); // Creates the format the date will be in
+                                DateTimeFormatter myFormatObj = DateTimeFormatter.ofPattern("dd/MM/yyyy"); // Creates the format the date will be in
                                 LocalDate myObj = LocalDate.now(); // Create a date object
                                 String formattedDate = myObj.format(myFormatObj);
                                 String currDate = formattedDate;
@@ -130,7 +140,7 @@ public class SceneController {
 
                                 try {
                                     // THIS WILL CONNECT TO THE DATABASE
-                                    Class.forName("com.mysql.jdbc.Driver");
+                                    Class.forName("com.mysql.cj.jdbc.Driver");
                                     Connection conn = DriverManager.getConnection(
                                             "jdbc:mysql://localhost:3306/library?useSSL=false","root","cs4347libraryproject2001");
 
@@ -214,6 +224,7 @@ public class SceneController {
         isbnCol.setCellValueFactory(new PropertyValueFactory<SearchResult, String>("Isbn"));
         titleCol.setCellValueFactory(new PropertyValueFactory<SearchResult, String>("Title"));
         authorCol.setCellValueFactory(new PropertyValueFactory<SearchResult, String>("Author"));
+        statusCol.setCellValueFactory(new PropertyValueFactory<SearchResult, String>("Status"));
         
         // Getting the button row set up
         Callback<TableColumn<SearchResult, String>, TableCell<SearchResult, String>> cellFactory
@@ -296,7 +307,7 @@ public class SceneController {
     }
 
     public static void insertIntoDatabase(String CardNo, String isbnNo){
-        DateTimeFormatter myFormatObj = DateTimeFormatter.ofPattern("dd-MMM-yyyy");
+        DateTimeFormatter myFormatObj = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
         LocalDate myObj = LocalDate.now(); // Create a date object
         String formattedDate = myObj.format(myFormatObj);
@@ -308,7 +319,7 @@ public class SceneController {
 
         try {
             // THIS WILL CONNECT TO THE DATABASE
-            Class.forName("com.mysql.jdbc.Driver");
+            Class.forName("com.mysql.cj.jdbc.Driver");
             Connection conn = DriverManager.getConnection(
                     "jdbc:mysql://localhost:3306/library?useSSL=false","root","cs4347libraryproject2001");
 
@@ -363,6 +374,28 @@ public class SceneController {
         }catch (Exception e) { System.out.println(e);}
 
 
+    }
+    
+    public void handleBorrowerAction(ActionEvent actionEvent)  throws IOException, SQLException {
+        scene = (Scene) ((Node) actionEvent.getSource()).getScene();
+        Alert emptyAlert = new Alert (AlertType.ERROR, "You have empty fields!", ButtonType.OK);
+        boolean passing = true;
+        if (FirstName.getText() == "" || LastName.getText() == "" || SSN.getText() == "" || Address.getText() == "" || City.getText() == "" || State.getText() == "")
+        {
+            emptyAlert.show();
+            return;
+        }
+        
+    	String firstN = FirstName.getText();
+        String lastN = LastName.getText();
+        String phoneNum = PhoneNumber.getText();
+        String social = SSN.getText();
+        String addr = Address.getText();
+        String cit = City.getText();
+        String stat = State.getText();
+        System.out.println(stat);
+        Borrower.connectDatabase();
+        Borrower.createNewBorrower(social, firstN + " " + lastN, addr, cit, stat, phoneNum);
     }
 
     /**
@@ -503,6 +536,10 @@ public class SceneController {
 
                         paidFinesCheckbox.setSelected(false);
                         displayFines(actionEvent);
+                    }
+                    else {
+                    	Alert alert = new Alert (AlertType.ERROR, "This book is still checked out!", ButtonType.OK);
+                    	alert.show();
                     }
                 }
             }

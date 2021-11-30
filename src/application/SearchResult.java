@@ -10,7 +10,7 @@ public class SearchResult {
         this.Isbn = I;
         this.Title = T;
         this.Author = A;
-        this. Status = S;
+        this.Status = S;
     }
 
     public String getIsbn(){

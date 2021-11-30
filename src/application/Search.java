@@ -31,7 +31,7 @@ public class Search
             {
                 rs = stmt.executeQuery("SELECT b.Isbn, b.Title, GROUP_CONCAT(a.Name) as Authors, " +
                         "(case when b.Isbn in(Select Isbn from library.book_loans where Date_in IS NULL) " +
-                        "then 'no' else 'yes' end) AS Available FROM library.book " +
+                        "then 'No' else 'Yes' end) AS Available FROM library.book " +
                         "AS b left outer join library.book_authors " +
                         "AS ba on b.Isbn=ba.Isbn left outer join library.authors as a on ba.Author_id=a.Author_id group by b.Isbn; ");
             }
@@ -39,7 +39,7 @@ public class Search
             {
                 rs = stmt.executeQuery("SELECT b.Isbn, b.Title, GROUP_CONCAT(a.Name) as Authors, " +
                         "(case when b.Isbn in(Select Isbn from library.book_loans where Date_in IS NULL) " +
-                        "then 'no' else 'yes' end) AS Available FROM library.book " +
+                        "then 'No' else 'Yes' end) AS Available FROM library.book " +
                         "AS b left outer join library.book_authors " +
                         "AS ba on b.Isbn=ba.Isbn left outer join library.authors as a on ba.Author_id=a.Author_id " +
                         "group by b.Isbn having b.Isbn like '%"+searchTxt+"%' or b.Title like '%"+searchTxt+ "%' or Authors like '%"+searchTxt+"%';");
