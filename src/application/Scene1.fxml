@@ -42,16 +42,19 @@
                     <content>
                         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                             <children>
-                                <TableView layoutX="15.0" layoutY="48.0" prefHeight="305.0" prefWidth="567.0">
+                                <TableView id="searchTable2" fx:id="searchTable2" layoutX="15.0" layoutY="48.0" prefHeight="305.0" prefWidth="567.0">
                                     <columns>
-                                        <TableColumn prefWidth="106.0" text="ISBN" />
-                                        <TableColumn prefWidth="193.0" text="Title" />
-                                        <TableColumn prefWidth="183.0" text="Author(s)" />
-                                        <TableColumn prefWidth="84.0" text="Check In" />
+                                        <TableColumn id="loanCol" fx:id="loanCol" prefWidth="50.0" text="Loan ID" />
+                                        <TableColumn id="blisbnCol" fx:id="blisbnCol" prefWidth="74.0" text="ISBN" />
+                                        <TableColumn id="cardCol" fx:id="cardCol" prefWidth="84.0" text="Card ID" />
+                                        <TableColumn id="outCol" fx:id="outCol" prefWidth="95.0" text="Date Out" />
+                                        <TableColumn id="dueCol" fx:id="dueCol" prefWidth="95.0" text="Due Date" />
+                                        <TableColumn id="inCol" fx:id="inCol" prefWidth="95.0" text="Date In" />
+                                        <TableColumn id="checkCol" fx:id="checkCol" prefWidth="74.0" text="Check In" />
                                     </columns>
                                 </TableView>
-                                <TextField layoutX="15.0" layoutY="14.0" prefHeight="25.0" prefWidth="191.0" promptText="Search for Book Loans..." />
-                                <Button layoutX="215.0" layoutY="14.0" mnemonicParsing="false" text="Search" />
+                                <TextField id="searchField2" fx:id="searchField2" layoutX="15.0" layoutY="14.0" prefHeight="25.0" prefWidth="191.0" promptText="Search for Book Loans..." />
+                                <Button fx:id="searchButton2" layoutX="215.0" layoutY="14.0" mnemonicParsing="false" text="Search" onAction="#checkInSearchAction"/>
                             </children>
                         </AnchorPane>
                     </content>
