@@ -10,6 +10,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -48,10 +49,23 @@ public class SceneController {
     @FXML private TableColumn  inCol;
     @FXML private TableColumn  checkCol;
 
+    @FXML private TableView finesTable;
+    @FXML private TableColumn borrowerNameCol;
+    @FXML private TableColumn bookTitleCol;
+    @FXML private TableColumn daysLateCol;
+    @FXML private TableColumn fineAmtCol;
+    @FXML private TableColumn finePaidCol;
+
+    @FXML private CheckBox paidFinesCheckbox;
+
+    @FXML private Tab finesTab;
+
     static String message = "Testing";
     static Text resultingMessage = new Text();
 
     private ObservableList<SearchResult> data;
+    private ObservableList<Object> allFines;
+    private ObservableList<Object> unpaidFines;
 
 
     @FXML
@@ -350,5 +364,154 @@ public class SceneController {
 
 
     }
+
+    /**
+     * This method is the onAction event handler which gets called once the Fines tab is displayed
+     * @param event
+     * @throws IOException
+     * @throws SQLException
+     */
+    @FXML
+    public void displayFines(Event event) throws IOException, SQLException
+    {
+        // Only display the data if the finesTab is selected
+        if (finesTab.isSelected())
+        {
+            // Bind the value of the column for each row to the variables in the FinesRow class
+            borrowerNameCol.setCellValueFactory(new PropertyValueFactory<FinesRow, String>("borrowerNameCol"));
+            bookTitleCol.setCellValueFactory(new PropertyValueFactory<FinesRow, String>("bookTitleCol"));
+            daysLateCol.setCellValueFactory(new PropertyValueFactory<FinesRow, String>("daysLateCol"));
+            fineAmtCol.setCellValueFactory(new PropertyValueFactory<FinesRow, String>("fineAmtCol"));
+            finePaidCol.setCellValueFactory(new PropertyValueFactory<FinesRow, String>("finePaidCol"));
+            try
+            {
+                Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/library?useSSL=false", "root", "cs4347libraryproject2001");
+                Statement stmt = conn.createStatement();
+                ResultSet rs = stmt.executeQuery("SELECT * FROM library.fines");
+
+                allFines = FXCollections.observableArrayList();
+                unpaidFines = FXCollections.observableArrayList();
+                while (rs.next())
+                {
+                    int loanID = rs.getInt("Loan_id");
+                    double fineAmt = rs.getDouble("Fine_amt");
+                    boolean paid = rs.getBoolean("Paid");
+
+                    FinesRow finesTableRow = new FinesRow(loanID, fineAmt, paid);
+                    allFines.add(finesTableRow);
+                    if (!paid)
+                    {
+                        unpaidFines.add(finesTableRow);
+                    }
+                }
+
+                finesTable.setItems(unpaidFines);
+                finesTable.setVisible(true);
+            } catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+        }
+        else
+        {
+            paidFinesCheckbox.setSelected(false);
+        }
+    }
+
+    /**
+     * This method is called when the user checks or un-checks the "Show Previously Paid Fines" checkbox
+     * @param actionEvent
+     * @throws IOException
+     * @throws SQLException
+     */
+    @FXML
+    public void getPaidFines(ActionEvent actionEvent) throws IOException, SQLException
+    {
+        scene = (Scene) ((Node) actionEvent.getSource()).getScene();
+
+        if (paidFinesCheckbox.isSelected())
+        {
+            finesTable.setItems(allFines);
+        }
+        else
+        {
+            finesTable.setItems(unpaidFines);
+        }
+        finesTable.setVisible(true);
+    }
+
+    /**
+     * This method is called when the user selects on a TableRow and clicks the "Refresh Fines" button
+     * @param actionEvent
+     * @throws IOException
+     * @throws SQLException
+     */
+    @FXML
+    public void updateUnpaidFines(ActionEvent actionEvent) throws IOException, SQLException
+    {
+        scene = (Scene) ((Node) actionEvent.getSource()).getScene();
+
+        try
+        {
+            Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/library?useSSL=false", "root", "cs4347libraryproject2001");
+            Statement stmt = conn.createStatement();
+
+            // Update all of the fines in the unpaidFines list and update database
+            for (Object o : unpaidFines)
+            {
+                FinesRow row = (FinesRow) o;
+                row.updateFine();
+                int loanID = row.getLoanID();
+                stmt.execute("UPDATE library.fines SET fines.Fine_amt=" + row.getFineAmount() + " WHERE fines.Loan_id=" + loanID);
+            }
+
+            paidFinesCheckbox.setSelected(false);
+            displayFines(actionEvent);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * This method is called when the user clicks on the "Pay Selected Fine" button.
+     * @param actionEvent
+     * @throws IOException
+     * @throws SQLException
+     */
+    @FXML
+    public void payFine(ActionEvent actionEvent) throws IOException, SQLException
+    {
+        FinesRow finesRow = (FinesRow) finesTable.getSelectionModel().getSelectedItem();
+
+        try
+        {
+            if (finesRow != null)
+            {
+                System.out.println("Loan_id: " + finesRow.getLoanID());
+                Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/library?useSSL=false", "root", "cs4347libraryproject2001");
+                Statement stmt = conn.createStatement();
+
+                // Only pay fines which haven't been payed yet
+                if (finesRow.getFinePaidCol().equals("No"))
+                {
+                    // Only pay the fine if the book has been checked in
+                    if (finesRow.getCheckInDate() != null)
+                    {
+                        stmt.execute("UPDATE library.fines SET fines.Paid=TRUE WHERE fines.Loan_id=" + finesRow.getLoanID());
+
+                        paidFinesCheckbox.setSelected(false);
+                        displayFines(actionEvent);
+                    }
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
 
 }

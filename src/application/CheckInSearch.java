@@ -16,7 +16,7 @@ public class CheckInSearch {
         try{
             //jdbc connection to database
             conn = DriverManager.getConnection(
-                    "jdbc:mysql://localhost:3306/book_loan_testing?useSSL=false","root","Jollypop212425!");
+                    "jdbc:mysql://localhost:3306/library?useSSL=false","root","cs4347libraryproject2001");
             Statement stmt= conn.createStatement();
             //ResultSet rs = null;
 
