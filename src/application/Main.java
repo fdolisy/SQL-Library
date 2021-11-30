@@ -27,8 +27,8 @@ public class Main extends Application {
 
             /* INITIALIZING STAGE PROPERTIES */
 
-            Image icon = new Image("bookshelf-icon.png");
-            stage.getIcons().add(icon);
+            //Image icon = new Image("bookshelf-icon.png");
+            //stage.getIcons().add(icon);
             stage.setTitle("Richardson Library App");
             stage.setResizable(false);
 

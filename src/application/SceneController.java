@@ -238,7 +238,7 @@ public class SceneController {
                                         btn.setOnAction(new EventHandler<ActionEvent>() {
                                             @Override
                                             public void handle(ActionEvent actionEvent) {
-                                                insertIntoDatabase(Integer.parseInt(tf.getText()), Integer.parseInt(isbn));
+                                                insertIntoDatabase(tf.getText(), isbn);
                                             }
                                         });
                                         dialogVbox.getChildren().add(btn);
@@ -281,7 +281,7 @@ public class SceneController {
 
     }
 
-    public static void insertIntoDatabase(int CardNo, int isbnNo){
+    public static void insertIntoDatabase(String CardNo, String isbnNo){
         DateTimeFormatter myFormatObj = DateTimeFormatter.ofPattern("dd-MMM-yyyy");
 
         LocalDate myObj = LocalDate.now(); // Create a date object
@@ -304,7 +304,7 @@ public class SceneController {
             // WILL CHECK THAT THE BOOK IS NOT ALREADY CHECKED OUT
             String bookCheckedOutOrNotQuery = "select count(Isbn) from book_loans where Date_in is null and Isbn = ?";
             PreparedStatement bookCheck = conn.prepareStatement(bookCheckedOutOrNotQuery);
-            bookCheck.setInt(1, isbnNo);
+            bookCheck.setString(1, isbnNo);
             ResultSet result2 = bookCheck.executeQuery();
             result2.next();
             if (result2.getInt(1) == 1) {
@@ -316,7 +316,7 @@ public class SceneController {
             // WILL CHECK IF THE NUMBER OF BOOKS LOANS FOR A CERTAIN CARD HOLDER IS UNDER 3
             String numberOfLoansQuery = "select count(Card_id) from book_loans where Date_in is null and Card_id = ?";
             PreparedStatement number = conn.prepareStatement(numberOfLoansQuery);
-            number.setInt(1, CardNo);
+            number.setString(1, CardNo);
             ResultSet result = number.executeQuery();
             result.next();
             if (result.getInt(1) >= 3) {
@@ -337,8 +337,8 @@ public class SceneController {
                 String insertQuery = "insert into book_loans values (?, ?, ?, ?, ?, NULL)";
                 PreparedStatement insertion = conn.prepareStatement(insertQuery);
                 insertion.setInt(1, max);
-                insertion.setInt(2, isbnNo);
-                insertion.setInt(3, CardNo);
+                insertion.setString(2, isbnNo);
+                insertion.setString(3, CardNo);
                 insertion.setString(4, currDate);
                 insertion.setString(5, dueDate);
                 insertion.execute();
