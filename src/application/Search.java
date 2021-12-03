@@ -17,12 +17,14 @@ public class Search
     {
         this.searchTxt = searchTxt;
     }
-    public ResultSet searchData()
+    public ResultSet searchData(Connection conn)
     {
         try{
             //jdbc connection to database
+        	/*
             conn = DriverManager.getConnection(
                     "jdbc:mysql://localhost:3306/library?useSSL=false","root","cs4347libraryproject2001");
+            */
             Statement stmt= conn.createStatement();
             //ResultSet rs = null;
 

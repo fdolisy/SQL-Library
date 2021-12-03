@@ -30,10 +30,10 @@ public class Borrower {
         this.Bname = firstN + " " + lastN;
     }
 
-    public static void connectDatabase ()
+    public static void connectDatabase (Connection conn)
     {
         try {
-            con = DriverManager.getConnection("jdbc:mysql://localhost:3306/library?useSSL=false","root","cs4347libraryproject2001");
+            con = conn;
 
         } catch (Exception e) {
             e.printStackTrace();

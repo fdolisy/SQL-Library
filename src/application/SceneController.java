@@ -1,5 +1,7 @@
 package application;
 
+import static java.time.temporal.ChronoUnit.DAYS;
+
 import java.io.IOException;
 import java.sql.*;
 import java.time.LocalDate;
@@ -78,7 +80,8 @@ public class SceneController {
     private ObservableList<SearchResult> data;
     private ObservableList<Object> allFines;
     private ObservableList<Object> unpaidFines;
-
+    
+    private static Connection conn;
 
     @FXML
     public void switchToScene1(ActionEvent event) throws IOException {
@@ -105,7 +108,7 @@ public class SceneController {
         String searchTxt = searchField2.getText();
         System.out.println(searchTxt);
         CheckInSearch checkInSearch = new CheckInSearch(searchTxt);
-        ResultSet rs = checkInSearch.searchData();
+        ResultSet rs = checkInSearch.searchData(conn);
 
         loanCol.setCellValueFactory(new PropertyValueFactory<CheckInSearchResult, String>("LoanID"));
         blisbnCol.setCellValueFactory(new PropertyValueFactory<CheckInSearchResult, String>("Isbn"));
@@ -141,11 +144,13 @@ public class SceneController {
                                 String idOfRow = cisr.getLoanID();
 
                                 try {
+                                	/*
                                     // THIS WILL CONNECT TO THE DATABASE
                                     Class.forName("com.mysql.cj.jdbc.Driver");
                                     Connection conn = DriverManager.getConnection(
                                             "jdbc:mysql://localhost:3306/library?useSSL=false","root","cs4347libraryproject2001");
-
+									*/
+									
                                     // WILL UPDATE THE ROW THE BUTTON WAS PRESSED WITH A DATE IN
                                     String q = "update book_loans set date_in = ? where loan_id = ?";
                                     PreparedStatement bookCheck = conn.prepareStatement(q);
@@ -159,7 +164,7 @@ public class SceneController {
                                         System.out.println("Success");
 
                                     // UPDATES THE TABLE RIGHT AWAY
-                                    ResultSet rs = checkInSearch.searchData();
+                                    ResultSet rs = checkInSearch.searchData(conn);
                                     try {
                                         ObservableList<Object> data = FXCollections.observableArrayList();
                                         while (rs.next()) {
@@ -221,7 +226,7 @@ public class SceneController {
         String searchTxt = searchField.getText();
         System.out.println(searchTxt);
         Search search = new Search(searchTxt);
-        ResultSet rs = search.searchData();
+        ResultSet rs = search.searchData(conn);
 
         isbnCol.setCellValueFactory(new PropertyValueFactory<SearchResult, String>("Isbn"));
         titleCol.setCellValueFactory(new PropertyValueFactory<SearchResult, String>("Title"));
@@ -307,6 +312,15 @@ public class SceneController {
         }
 
     }
+    
+    public void createConnection(String url, String user, String password) {
+    	try {
+    		Class.forName("com.mysql.cj.jdbc.Driver");
+			conn = DriverManager.getConnection(url, user, password);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+    }
 
     public static void insertIntoDatabase(String CardNo, String isbnNo){
         DateTimeFormatter myFormatObj = DateTimeFormatter.ofPattern("dd/MM/yyyy");
@@ -320,10 +334,12 @@ public class SceneController {
         String dueDate = formattedDate2;
 
         try {
+        	/*
             // THIS WILL CONNECT TO THE DATABASE
             Class.forName("com.mysql.cj.jdbc.Driver");
             Connection conn = DriverManager.getConnection(
                     "jdbc:mysql://localhost:3306/library?useSSL=false","root","cs4347libraryproject2001");
+			*/
 
             // THE INTS WILL BE GIVEN WHEN CONNECTING THIS TO THE GUI
             boolean passing = true;
@@ -423,7 +439,7 @@ public class SceneController {
         	SSNFormat.show();
         }
         else {
-        	Borrower.connectDatabase();
+        	Borrower.connectDatabase(conn);
             Borrower.createNewBorrower(social, Bname, addr, cit, stat, phoneNum);
         }
     }
@@ -448,7 +464,7 @@ public class SceneController {
             finePaidCol.setCellValueFactory(new PropertyValueFactory<FinesRow, String>("finePaidCol"));
             try
             {
-                Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/library?useSSL=false", "root", "cs4347libraryproject2001");
+                //Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/library?useSSL=false", "root", "cs4347libraryproject2001");
                 Statement stmt = conn.createStatement();
                 ResultSet rs = stmt.executeQuery("SELECT * FROM library.fines");
 
@@ -460,7 +476,7 @@ public class SceneController {
                     double fineAmt = rs.getDouble("Fine_amt");
                     boolean paid = rs.getBoolean("Paid");
 
-                    FinesRow finesTableRow = new FinesRow(loanID, fineAmt, paid);
+                    FinesRow finesTableRow = new FinesRow(loanID, fineAmt, paid, conn);
                     allFines.add(finesTableRow);
                     if (!paid)
                     {
@@ -516,7 +532,7 @@ public class SceneController {
 
         try
         {
-            Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/library?useSSL=false", "root", "cs4347libraryproject2001");
+            //Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/library?useSSL=false", "root", "cs4347libraryproject2001");
             Statement stmt = conn.createStatement();
 
             // Update all of the fines in the unpaidFines list and update database
@@ -526,6 +542,32 @@ public class SceneController {
                 row.updateFine();
                 int loanID = row.getLoanID();
                 stmt.execute("UPDATE library.fines SET fines.Fine_amt=" + row.getFineAmount() + " WHERE fines.Loan_id=" + loanID);
+            }
+            
+            // Add any new books which may have passed its due date to FINES
+            ResultSet rs = stmt.executeQuery("SELECT Loan_id, Due_date, Date_in FROM book_loans WHERE Date_in IS NULL;");
+            while (rs.next())
+            {
+            	if (rs.getString("Due_date") == null)
+            		continue;
+            	
+                int loanID = rs.getInt("Loan_id");
+                String dueDateString = rs.getString("Due_date");
+                System.out.println(dueDateString);
+                DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+                LocalDate dueDate = LocalDate.parse(dueDateString, dateFormat);
+                long daysLate = DAYS.between(dueDate.atStartOfDay(), LocalDate.now().atStartOfDay());
+                // If the current date is after the due date, then add to fines table
+                if (LocalDate.now().atStartOfDay().isAfter(dueDate.atStartOfDay()))
+                {
+                    Statement stmt2 = conn.createStatement();
+                    ResultSet rs2 = stmt2.executeQuery("SELECT * FROM fines WHERE Loan_id = " + loanID + ";");
+                    if (!rs2.next())
+                    {
+                        stmt2.execute("INSERT INTO fines (Loan_id, Fine_amt, Paid) " +
+                                "VALUES (" + loanID + ", " + daysLate * 0.25 + ", FALSE);");
+                    }
+                }
             }
 
             paidFinesCheckbox.setSelected(false);
@@ -553,7 +595,7 @@ public class SceneController {
             if (finesRow != null)
             {
                 System.out.println("Loan_id: " + finesRow.getLoanID());
-                Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/library?useSSL=false", "root", "cs4347libraryproject2001");
+                //Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/library?useSSL=false", "root", "cs4347libraryproject2001");
                 Statement stmt = conn.createStatement();
 
                 // Only pay fines which haven't been payed yet

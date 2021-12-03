@@ -13,15 +13,29 @@ import javafx.scene.Scene;
 import java.sql.*;
 
 public class Main extends Application {
+	
+	private static String url;
+	private static String user;
+	private static String password;
 
     public static void main(String[] args) {
+    	System.out.println("url = " + args[0]);
+    	System.out.println("user = " + args[1]);
+    	System.out.println("password = " + args[2]);
+    	url = args[0];
+    	user = args[1];
+    	password = args[2];
         launch(args);
     }
 
     @Override
     public void start(Stage stage) {
         try {
-            Parent root = FXMLLoader.load(getClass().getResource("Scene1.fxml"));
+        	FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("Scene1.fxml"));
+        	
+        	Parent root = (Parent)fxmlLoader.load();
+        	SceneController controller = fxmlLoader.<SceneController>getController();
+        	controller.createConnection(url, user, password);
             Scene scene = new Scene(root);
             String css = this.getClass().getResource("application.css").toExternalForm();
             scene.getStylesheets().add(css);
@@ -36,8 +50,10 @@ public class Main extends Application {
             /* DATABASE CALL */
 
             try{
-                Connection con = DriverManager.getConnection(
+            	/*
+            	Connection con = DriverManager.getConnection(
                         "jdbc:mysql://localhost:3306/library?useSSL=false","root","cs4347libraryproject2001");
+                
                 Statement stmt = con.createStatement();
 
                 ResultSet rs = stmt.executeQuery(""
@@ -52,6 +68,7 @@ public class Main extends Application {
                     System.out.println(rs.getString(1) + "  " + rs.getString(2) + "  " + rs.getString(3) + "  " + rs.getString(4));
                 }
                 con.close();
+                */
             } catch(Exception e) { System.out.println("failed to connect to database"+ e); }
 
 

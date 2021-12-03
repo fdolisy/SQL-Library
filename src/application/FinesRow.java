@@ -31,22 +31,22 @@ public class FinesRow
 
     private long daysLate;
 
-    private final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("M/d/yyyy");
+    private final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     private final DecimalFormat dollarFormat = new DecimalFormat("#0.00");
 
-    public FinesRow(int loan_id, double fine_amt, boolean paid)
+    public FinesRow(int loan_id, double fine_amt, boolean paid, Connection conn)
     {
         this.loan_id = loan_id;
         this.fine_amt = fine_amt;
         this.paid = paid;
-        setDisplayTableRows();
+        setDisplayTableRows(conn);
     }
 
-    private void setDisplayTableRows()
+    private void setDisplayTableRows(Connection conn)
     {
         try
         {
-            Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/library?useSSL=false", "root", "cs4347libraryproject2001");
+            //Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/library?useSSL=false", "root", "cs4347libraryproject2001");
             Statement stmt = conn.createStatement();
             ResultSet rs = stmt.executeQuery("SELECT book.title AS BookTitle, borrower.bname AS BorrowerName, book_loans.Date_out AS CheckOutDate, book_loans.Date_in AS CheckInDate, book_loans.Due_date AS BookDueDate "
                     + "FROM fines, book_loans, borrower, book "
@@ -96,10 +96,17 @@ public class FinesRow
 
     public void updateFine()
     {
+    	daysLate = Integer.parseInt(daysLateCol);
+    	if (!paid)
+    	{
+    		fine_amt = 0.25 * daysLate;
+    	}
+    	/*
         if (!paid)
         {
             fine_amt += 0.25;
         }
+        */
     }
 
     public int getLoanID()
