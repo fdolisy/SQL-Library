@@ -1,0 +1,1 @@
+java --module-path "D:\Javafx\javafx-sdk-17.0.1\lib" --add-modules javafx.controls,javafx.fxml -jar library.jar "jdbc:mysql://localhost:3306/library?useSSL=false" "root" "cs4347libraryproject2001" 
